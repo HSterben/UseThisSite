@@ -136,7 +136,7 @@ export default function Home() {
 
       <footer className="py-6 text-center border-t border-zinc-200 dark:border-zinc-800">
         <p className="text-xs text-zinc-400 dark:text-zinc-600">
-          UseThis.Site — Find the right tool for any task
+          UseThis.Site - Find the right tool for any task
         </p>
       </footer>
     </div>

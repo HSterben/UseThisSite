@@ -15,7 +15,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "UseThis.Site — Find the Right Tool for Any Task",
+  title: "UseThis.Site | Webtool Finder",
   description:
     "Describe what you need to do, and we'll recommend the best websites and tools to get it done. No ads, no SEO spam, just answers.",
   keywords: [
