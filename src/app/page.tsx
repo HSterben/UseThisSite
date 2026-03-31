@@ -11,6 +11,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [currentQuery, setCurrentQuery] = useState("");
+  const [useAiFallback, setUseAiFallback] = useState(false);
   const [filters, setFilters] = useState<Filters>({
     free: false,
     beginner: false,
@@ -19,7 +20,7 @@ export default function Home() {
   });
 
   const performSearch = useCallback(
-    async (query: string, activeFilters: Filters) => {
+    async (query: string, activeFilters: Filters, aiFallback: boolean) => {
       setIsLoading(true);
       setHasSearched(true);
       setCurrentQuery(query);
@@ -28,7 +29,7 @@ export default function Home() {
         const response = await fetch("/api/find-tools", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query, filters: activeFilters }),
+          body: JSON.stringify({ query, filters: activeFilters, aiFallback }),
         });
 
         const data = await response.json();
@@ -48,14 +49,22 @@ export default function Home() {
   );
 
   function handleSearch(query: string) {
-    performSearch(query, filters);
+    performSearch(query, filters, useAiFallback);
   }
 
   function handleFilterToggle(key: FilterKey) {
     const newFilters = { ...filters, [key]: !filters[key] };
     setFilters(newFilters);
     if (currentQuery) {
-      performSearch(currentQuery, newFilters);
+      performSearch(currentQuery, newFilters, useAiFallback);
+    }
+  }
+
+  function handleAiFallbackToggle() {
+    const next = !useAiFallback;
+    setUseAiFallback(next);
+    if (currentQuery) {
+      performSearch(currentQuery, filters, next);
     }
   }
 
@@ -92,7 +101,26 @@ export default function Home() {
           <SearchBar onSearch={handleSearch} isLoading={isLoading} />
 
           <div className={`mt-5 transition-all duration-500 ${hasSearched ? "opacity-100" : "opacity-0 pointer-events-none h-0 overflow-hidden"}`}>
-            <FilterChips filters={filters} onToggle={handleFilterToggle} />
+            <div className="flex flex-col items-center gap-3">
+              <FilterChips filters={filters} onToggle={handleFilterToggle} />
+              <button
+                type="button"
+                onClick={handleAiFallbackToggle}
+                className={`
+                  inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium
+                  border transition-all duration-200 cursor-pointer
+                  ${
+                    useAiFallback
+                      ? "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20"
+                      : "bg-white dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:text-indigo-600 dark:hover:text-indigo-400"
+                  }
+                `}
+                aria-pressed={useAiFallback}
+              >
+                <span className="text-sm">🧠</span>
+                AI fallback (find specific sites)
+              </button>
+            </div>
           </div>
         </div>
 
